@@ -1,0 +1,44 @@
+{
+  "name": "gha-slack",
+  "version": "1.0.0",
+  "description": "Github Actions Slack Notifications",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint ./",
+    "lintf": "eslint --fix ./",
+    "package": "ncc build index.js -o dist",
+    "test": "snyk test && npm run lint && jest",
+    "prepare": "snyk protect"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WW-Digital/gha-slack.git"
+  },
+  "keywords": [
+    "GitHub",
+    "Actions",
+    "JavaScript"
+  ],
+  "author": "GitHub",
+  "license": "PRIVATE",
+  "dependencies": {
+    "@actions/core": "1.2.3",
+    "axios": "^0.19.2"
+  },
+  "devDependencies": {
+    "@zeit/ncc": "0.22.1",
+    "eslint": "6.8.0",
+    "eslint-config-airbnb-base": "14.1.0",
+    "eslint-plugin-import": "2.20.2",
+    "husky": "4.2.5",
+    "jest": "25.3.0",
+    "snyk": "1.305.1",
+    "eslint-plugin-jest": "23.8.2"
+  },
+  "snyk": true,
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lintf"
+    }
+  }
+}

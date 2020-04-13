@@ -1,0 +1,20 @@
+name: 'GHA Slack'
+author: 'Pinal Bhatt'
+description: 'Github Actions Slack Notifications'
+inputs:
+  WebHook:
+    description: 'Slack WebHook Url'
+    required: true
+  Message:
+    description: message
+    default: 'Message from Github Actions'
+  Category:
+    description: one of info or failure or broadcast
+    default: info
+
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
+branding:
+  icon: 'dollar-sign'
+  color: 'blue'
