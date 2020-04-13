@@ -6,7 +6,7 @@ async function run() {
   try {
     const webHookUrl = core.getInput('WebHook');
     const category = Number(core.getInput('Category'));
-    const message = Number(core.getInput('Message'));
+    const message = core.getInput('Message');
     await postMsg(webHookUrl, category, message);
   } catch (error) {
     core.setFailed(error.message);
