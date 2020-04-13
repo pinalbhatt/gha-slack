@@ -5,7 +5,7 @@ const { postMsg } = require('./lib/slack');
 async function run() {
   try {
     const webHookUrl = core.getInput('WebHook');
-    const category = Number(core.getInput('Category'));
+    const category = core.getInput('Category');
     const message = core.getInput('Message');
     await postMsg(webHookUrl, category, message);
   } catch (error) {
