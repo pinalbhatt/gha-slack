@@ -2580,12 +2580,12 @@ module.exports = function settle(resolve, reject, response) {
 
 const axios = __webpack_require__(53).default;
 
-const getCatOb = (cat) => {
+const getCatOb = (cat, repo, branch) => {
   let catMsg;
   let img;
   switch (cat) {
     case 'broadcast': {
-      catMsg = 'Broadcast.';
+      catMsg = `${repo} (${branch})`;
       img = 'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcR0syM84yMHZY6ZpmKgMIlUpEj5vibeBi_897KKvMX37lms_ZsI&usqp=CAU';
       break;
     }
@@ -2594,8 +2594,13 @@ const getCatOb = (cat) => {
       img = 'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTghhv4H4t4ufRvtzJAXGscEsiZ0ANiKNWEK_Cnu2TgymW0Dwd-&usqp=CAU';
       break;
     }
+    case 'info': {
+      catMsg = `You have Notification from ${repo} (${branch})`;
+      img = 'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQass1mZPNJmdfHfaUt0z5VY78bG0z79Y2S28MRzt8fyzipRAz_&usqp=CAU';
+      break;
+    }
     default: {
-      catMsg = 'You have Notification.';
+      catMsg = 'You have Notification:';
       img = 'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQass1mZPNJmdfHfaUt0z5VY78bG0z79Y2S28MRzt8fyzipRAz_&usqp=CAU';
       break;
     }
@@ -2605,7 +2610,13 @@ const getCatOb = (cat) => {
 
 const getGhOb = () => {
   const repo = process.env.GITHUB_REPOSITORY;
-  const branch = (process.env.GITHUB_REF).replace('refs/heads/', '');
+  const ref = process.env.GITHUB_REF;
+  let branch;
+  if (ref.indexOf('refs/tags/') >= 0) {
+    branch = ref.replace('refs/tags/', '');
+  } else {
+    branch = ref.replace('refs/heads/', '');
+  }
   const event = process.env.GITHUB_EVENT_NAME;
   const author = process.env.GITHUB_ACTOR;
   const workFlow = process.env.GITHUB_WORKFLOW;
@@ -2616,16 +2627,16 @@ const getGhOb = () => {
 };
 
 const getPayload = (cat, msg) => {
-  const catOb = getCatOb(cat);
   const ghOb = getGhOb();
+  const catOb = getCatOb(cat, ghOb.repo, ghOb.branch);
+
   const payload = {
-    channel: "pb-logs",
     blocks: [
       {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `*${catOb.catMsg}*\n${msg}\n*<${ghOb.link}|Link to Logs>*`,
+          text: `<@here> *${catOb.catMsg}*\n${msg}\n*<${ghOb.link}|Link to Logs>*`,
         },
         accessory: {
           type: 'image',
@@ -2633,42 +2644,44 @@ const getPayload = (cat, msg) => {
           alt_text: catOb.catMsg,
         },
       },
-      {
-        type: 'section',
-        fields: [
-          {
-            type: 'mrkdwn',
-            text: `*Repo:*\n${ghOb.repo}`,
-          },
-          {
-            type: 'mrkdwn',
-            text: `*Branch:*\n${ghOb.branch}`,
-          },
-          {
-            type: 'mrkdwn',
-            text: `*Event:*\n${ghOb.event}`,
-          },
-          {
-            type: 'mrkdwn',
-            text: `*Author:*\n${ghOb.author}`,
-          },
-          {
-            type: 'mrkdwn',
-            text: `*Workflow:*\n${ghOb.workFlow}`,
-          },
-        ],
-      },
-      {
-        type: 'context',
-        elements: [
-          {
-            type: 'mrkdwn',
-            text: ':github: GitHub Actions Notification - Powered by Dragon.',
-          },
-        ],
-      },
     ],
   };
+  if (cat === 'failure') {
+    payload.blocks.push({
+      type: 'section',
+      fields: [
+        {
+          type: 'mrkdwn',
+          text: `*Repo:*\n${ghOb.repo}`,
+        },
+        {
+          type: 'mrkdwn',
+          text: `*Branch:*\n${ghOb.branch}`,
+        },
+        {
+          type: 'mrkdwn',
+          text: `*Event:*\n${ghOb.event}`,
+        },
+        {
+          type: 'mrkdwn',
+          text: `*Author:*\n${ghOb.author}`,
+        },
+        {
+          type: 'mrkdwn',
+          text: `*Workflow:*\n${ghOb.workFlow}`,
+        },
+      ],
+    });
+  }
+  payload.blocks.push({
+    type: 'context',
+    elements: [
+      {
+        type: 'mrkdwn',
+        text: ':github: GitHub Actions Notification - Powered by Dragon.',
+      },
+    ],
+  });
   return payload;
 };
 
