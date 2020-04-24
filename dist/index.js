@@ -2580,12 +2580,12 @@ module.exports = function settle(resolve, reject, response) {
 
 const axios = __webpack_require__(53).default;
 
-const getCatOb = (cat, repo, branch) => {
+const getCatOb = (cat, repo) => {
   let catMsg;
   let img;
   switch (cat) {
     case 'broadcast': {
-      catMsg = `${repo} (${branch})`;
+      catMsg = repo;
       img = 'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcR0syM84yMHZY6ZpmKgMIlUpEj5vibeBi_897KKvMX37lms_ZsI&usqp=CAU';
       break;
     }
@@ -2628,7 +2628,7 @@ const getGhOb = () => {
 
 const getPayload = (cat, msg) => {
   const ghOb = getGhOb();
-  const catOb = getCatOb(cat, ghOb.repo, ghOb.branch);
+  const catOb = getCatOb(cat, ghOb.repo);
 
   const payload = {
     blocks: [
@@ -2636,7 +2636,7 @@ const getPayload = (cat, msg) => {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `<@here> *${catOb.catMsg}*\n${msg}\n*<${ghOb.link}|Link to Logs>*`,
+          text: `*${catOb.catMsg}*\n${msg}\n*<${ghOb.link}| :link: Link to Logs >*`,
         },
         accessory: {
           type: 'image',
